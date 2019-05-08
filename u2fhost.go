@@ -25,7 +25,7 @@ var _B64 = base64.URLEncoding.WithPadding(base64.NoPadding)
 
 type U2fh struct {}
 
-func NewU2fh() (*U2fh, error) {
+func New() (*U2fh, error) {
 	rc := C.u2fh_global_init(0)
 	if rc != C.U2FH_OK {
 		return nil, fmt.Errorf("unable to globally initialize u2fh library: %s", rcToStrErr(rc))

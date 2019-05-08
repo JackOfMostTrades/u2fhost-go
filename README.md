@@ -1,52 +1,55 @@
-package u2fhost
+u2fhost-go
+==========
 
-import (
-	"crypto/rand"
-	"testing"
-)
+This library wraps [Yubico's libu2f-host](https://github.com/Yubico/libu2f-host) native library.
 
-func TestRegisterAndAuthenticate(t *testing.T) {
-	u2fh, err := New()
+Example Usage:
+
+```go
+import "github.com/JackOfMostTrades/u2fhost-go"
+
+func main() {
+	u2fh, err := u2fhost.New()
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	defer u2fh.Close()
 
 	devices, err := u2fh.GetDevices()
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	defer devices.Close()
 
 	for i := uint(0); i < devices.Count(); i++ {
 		desc, err := devices.Describe(i)
 		if err != nil {
-			t.Fatal(err)
+			painc(err)
 		}
-		t.Log(desc)
+		println(desc)
 	}
 
 	challenge := make([]byte, 32)
 	_, err = rand.Read(challenge)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 
 	resp, err := devices.Register(challenge, "https://demo.yubico.com")
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
-	t.Log(resp.RegistrationData)
-	t.Log(resp.ClientData)
 
 	regData, err := ParseRegistrationData(resp.RegistrationData)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 
 	authRes, err := devices.Authenticate(challenge, "https://demo.yubico.com", regData.KeyHandle)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
-	t.Log(authRes.Signature)
+	println(authRes.Signature)
 }
+
+```
